@@ -102,9 +102,31 @@ jobs:
           # Get the default branch (usually main or master)
           DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
           
-          # Checkout the default branch
+          # Save the updated formula content to temp files to prevent loss during checkout
+          mkdir -p /tmp/formula-updates
+          if [ -f "Formula/tctl.rb" ]; then
+            cp Formula/tctl.rb /tmp/formula-updates/
+          fi
+          if [ -f "Formula/Versions/tctl@$VERSION.rb" ]; then
+            cp "Formula/Versions/tctl@$VERSION.rb" /tmp/formula-updates/
+          fi
+          
+          # Force checkout the default branch (this will discard any changes)
           git fetch origin $DEFAULT_BRANCH
-          git checkout -B $DEFAULT_BRANCH origin/$DEFAULT_BRANCH
+          git checkout -f -B $DEFAULT_BRANCH origin/$DEFAULT_BRANCH
+          
+          # Recreate the formula updates
+          if [ -f "/tmp/formula-updates/tctl.rb" ]; then
+            cp /tmp/formula-updates/tctl.rb Formula/tctl.rb
+          fi
+          
+          # Ensure the Versions directory exists
+          mkdir -p Formula/Versions
+          
+          # Copy back the versioned formula if it exists
+          if [ -f "/tmp/formula-updates/tctl@$VERSION.rb" ]; then
+            cp "/tmp/formula-updates/tctl@$VERSION.rb" "Formula/Versions/tctl@$VERSION.rb"
+          fi
           
           # Now make your changes and commit them
           git add Formula/tctl.rb Formula/Versions/tctl@$VERSION.rb
