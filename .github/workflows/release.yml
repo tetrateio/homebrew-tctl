@@ -88,9 +88,18 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          
+          # Get the default branch (usually main or master)
+          DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+          
+          # Checkout the default branch
+          git fetch origin $DEFAULT_BRANCH
+          git checkout -B $DEFAULT_BRANCH origin/$DEFAULT_BRANCH
+          
+          # Now make your changes and commit them
           git add Formula/tctl.rb Formula/Versions/tctl@$VERSION.rb
           git commit -m "Update formulas for version $VERSION"
-          git push
+          git push origin $DEFAULT_BRANCH
           
       - name: Create Release
         id: create_release
