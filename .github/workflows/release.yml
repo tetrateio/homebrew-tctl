@@ -2,10 +2,10 @@ name: Create Release
 
 on:
   push:
+    branches:
+    - main
     tags:
       - 'v*' # Triggers on any tag starting with 'v' (e.g., v1.0.0)
-    branches-ignore:
-      - main
 
 
 # Set permissions for the workflow
@@ -95,8 +95,9 @@ jobs:
           
       - name: Commit formula updates
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git diff
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
           
           # Get the default branch (usually main or master)
           DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
