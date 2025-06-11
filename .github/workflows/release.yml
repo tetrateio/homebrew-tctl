@@ -1,0 +1,70 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers on any tag starting with 'v' (e.g., v1.0.0)
+
+jobs:
+  build:
+    name: Create Release
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        
+      - name: Extract release notes
+        id: extract_notes
+        run: |
+          # Extract changelog section for this version if available
+          if [ -f CHANGELOG.md ]; then
+            NOTES=$(awk -v ver=$VERSION '/^## \['$VERSION'\]/{flag=1;next}/^## \[/{flag=0}flag' CHANGELOG.md)
+            if [ -z "$NOTES" ]; then
+              NOTES="Release version $VERSION"
+            fi
+          else
+            NOTES="Release version $VERSION"
+          fi
+          echo "NOTES<<EOF" >> $GITHUB_ENV
+          echo "$NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Update formula version
+        run: |
+          sed -i 's/version "[0-9]\+\.[0-9]\+\.[0-9]\+"/version "'$VERSION'"/' Formula/tctl.rb
+          
+          # Get new checksums for the binaries
+          INTEL_URL="https://binaries.dl.tetrate.io/public/raw/versions/darwin-amd64-$VERSION/tctl"
+          ARM_URL="https://binaries.dl.tetrate.io/public/raw/versions/darwin-arm64-$VERSION/tctl"
+          
+          mkdir -p /tmp/tctl-checksums
+          curl -s -L -o /tmp/tctl-checksums/tctl-intel "$INTEL_URL" 
+          curl -s -L -o /tmp/tctl-checksums/tctl-arm "$ARM_URL"
+          
+          INTEL_SHA=$(shasum -a 256 /tmp/tctl-checksums/tctl-intel | cut -d ' ' -f 1)
+          ARM_SHA=$(shasum -a 256 /tmp/tctl-checksums/tctl-arm | cut -d ' ' -f 1)
+          
+          # Update the SHA256 checksums in the formula
+          sed -i 's/sha256 "[a-f0-9]\{64\}" # Intel/sha256 "'$INTEL_SHA'" # Intel/' Formula/tctl.rb
+          sed -i 's/sha256 "[a-f0-9]\{64\}" # ARM/sha256 "'$ARM_SHA'" # ARM/' Formula/tctl.rb
+          
+      - name: Commit formula updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "Update formula for version $VERSION"
+          git push
+          
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ env.VERSION }}
+          body: ${{ env.NOTES }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

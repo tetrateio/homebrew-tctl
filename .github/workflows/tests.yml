@@ -1,0 +1,21 @@
+name: Brew Test
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test-formula:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Homebrew
+        run: |
+          brew update
+          brew tap --force $GITHUB_REPOSITORY
+
+      - name: Test formula
+        run: brew install -v tctl
