@@ -33,10 +33,8 @@ jobs:
           echo "$NOTES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Update formula version
+      - name: Create formulas for this version
         run: |
-          sed -i 's/version "[0-9]\+\.[0-9]\+\.[0-9]\+"/version "'$VERSION'"/' Formula/tctl.rb
-          
           # Get new checksums for the binaries
           INTEL_URL="https://binaries.dl.tetrate.io/public/raw/versions/darwin-amd64-$VERSION/tctl"
           ARM_URL="https://binaries.dl.tetrate.io/public/raw/versions/darwin-arm64-$VERSION/tctl"
@@ -48,15 +46,50 @@ jobs:
           INTEL_SHA=$(shasum -a 256 /tmp/tctl-checksums/tctl-intel | cut -d ' ' -f 1)
           ARM_SHA=$(shasum -a 256 /tmp/tctl-checksums/tctl-arm | cut -d ' ' -f 1)
           
-          # Update the SHA256 checksums in the formula
-          sed -i 's/sha256 "[a-f0-9]\{64\}" # Intel/sha256 "'$INTEL_SHA'" # Intel/' Formula/tctl.rb
-          sed -i 's/sha256 "[a-f0-9]\{64\}" # ARM/sha256 "'$ARM_SHA'" # ARM/' Formula/tctl.rb
+          # 1. Update the main formula
+          sed -i 's/version "[0-9]\+\.[0-9]\+\.[0-9]\+"/version "'$VERSION'"/g' Formula/tctl.rb
+          sed -i 's/sha256 "[a-f0-9]\{64\}" # Intel/sha256 "'$INTEL_SHA'" # Intel/g' Formula/tctl.rb
+          sed -i 's/sha256 "[a-f0-9]\{64\}" # ARM/sha256 "'$ARM_SHA'" # ARM/g' Formula/tctl.rb
+          
+          # 2. Create versioned formula
+          mkdir -p Formula/Versions
+          
+          # Format version for class name (remove dots)
+          VERSION_NO_DOTS=$(echo $VERSION | tr -d '.')
+          
+          cat > Formula/Versions/tctl@$VERSION.rb << EOF
+          class Tctl${VERSION_NO_DOTS} < Formula
+            desc "Tetrate Service Bridge Command Line Interface ${VERSION}"
+            homepage "https://docs.tetrate.io/service-bridge/reference/cli/guide/"
+            version "${VERSION}"
+            license "Commercial"
+            conflicts_with "tctl", because: "Provides the same binary"
+          
+            if Hardware::CPU.intel?
+              url "https://binaries.dl.tetrate.io/public/raw/versions/darwin-amd64-${VERSION}/tctl"
+              sha256 "${INTEL_SHA}" # Intel
+            else
+              url "https://binaries.dl.tetrate.io/public/raw/versions/darwin-arm64-${VERSION}/tctl"
+              sha256 "${ARM_SHA}" # ARM
+            end
+          
+            def install
+              bin.install "tctl" => "tctl-${VERSION}"
+              bin.install_symlink "tctl-${VERSION}" => "tctl@${VERSION}"
+            end
+          
+            test do
+              assert_match version.to.s, shell_output("\#{bin}/tctl@${VERSION} version 2>&1")
+            end
+          end
+          EOF
           
       - name: Commit formula updates
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -am "Update formula for version $VERSION"
+          git add Formula/tctl.rb Formula/Versions/tctl@$VERSION.rb
+          git commit -m "Update formulas for version $VERSION"
           git push
           
       - name: Create Release
@@ -67,8 +100,13 @@ jobs:
           body: |
             To install this release:
             ```
+            # Latest version
             brew tap smarunich/tctl
             brew install smarunich/tctl/tctl
+            
+            # This specific version
+            brew tap smarunich/tctl
+            brew install smarunich/tctl/tctl@${{ env.VERSION }}
             ```
             
             ${{ env.NOTES }}
