@@ -142,12 +142,12 @@ jobs:
             To install this release:
             ```
             # Latest version
-            brew tap smarunich/tctl
-            brew install smarunich/tctl/tctl
+            brew tap tetrateio/tctl
+            brew install tetrateio/tctl/tctl
             
             # This specific version
-            brew tap smarunich/tctl
-            brew install smarunich/tctl/tctl@${{ env.VERSION }}
+            brew tap tetrateio/tctl
+            brew install tetrateio/tctl/tctl@${{ env.VERSION }}
             ```
             
             ${{ env.NOTES }}

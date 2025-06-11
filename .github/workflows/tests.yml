@@ -20,4 +20,4 @@ jobs:
       - name: Test formula
         run: |
           # Install with explicit tap reference to ensure our formula is used
-          brew install -v smarunich/tctl/tctl
+          brew install -v tetrateio/tctl/tctl

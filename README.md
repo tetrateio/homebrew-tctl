@@ -6,10 +6,10 @@ This repository contains the Homebrew formula for installing the Tetrate Service
 
 ```bash
 # Add this tap to your Homebrew
-brew tap smarunich/tctl
+brew tap tetrateio/tctl
 
 # Install tctl (explicitly use our tap to override default formula)
-brew install smarunich/tctl/tctl
+brew install tetrateio/tctl/tctl
 ```
 
 ## Documentation
