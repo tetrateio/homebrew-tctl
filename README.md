@@ -34,7 +34,7 @@ For more information about using `tctl`, please refer to the [official documenta
 
 This tap is set up with automated formula generation based on Git tags. To add a new formula version:
 
-1. Create and push a new tag following the format `v*` (e.g., `v1.12.5`)
+1. Create and push a new tag following the format `v*` (e.g., `v1.12.4`)
    ```bash
    git tag v1.12.4
    git push origin v1.12.4
