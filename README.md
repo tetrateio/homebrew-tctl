@@ -27,3 +27,26 @@ which tctl
 ## Documentation
 
 For more information about using `tctl`, please refer to the [official documentation](https://docs.tetrate.io/service-bridge/reference/cli/guide/).
+
+## For Maintainers
+
+### Adding a New Formula Version
+
+This tap is set up with automated formula generation based on Git tags. To add a new formula version:
+
+1. Create and push a new tag following the format `v*` (e.g., `v1.12.5`)
+   ```bash
+   git tag v1.12.4
+   git push origin v1.12.4
+   ```
+
+2. The GitHub Actions workflow will automatically:
+   - Extract the version number from the tag
+   - Download the appropriate binary files for both Intel and ARM architectures
+   - Calculate SHA256 checksums
+   - Update the main `tctl.rb` formula to the new version
+   - Create a versioned formula in `Formula/Versions/tctl@<version>.rb`
+   - Commit and push these changes back to the repository
+   - Create a GitHub release with installation instructions
+
+No manual formula editing is required! The system handles both the latest version and versioned formulas automatically.
