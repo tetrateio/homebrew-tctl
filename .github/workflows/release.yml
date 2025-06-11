@@ -63,11 +63,11 @@ jobs:
           # 2. Create versioned formula
           mkdir -p Formula/Versions
           
-          # Format version for class name (remove dots)
+          # Format version for class name using Homebrew's versioned formula convention
           VERSION_NO_DOTS=$(echo $VERSION | tr -d '.')
           
           cat > Formula/Versions/tctl@$VERSION.rb << EOF
-          class Tctl${VERSION_NO_DOTS} < Formula
+          class TctlAT${VERSION_NO_DOTS} < Formula
             desc "Tetrate Service Bridge Command Line Interface ${VERSION}"
             homepage "https://docs.tetrate.io/service-bridge/reference/cli/guide/"
             version "${VERSION}"
