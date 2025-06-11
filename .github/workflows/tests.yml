@@ -18,4 +18,6 @@ jobs:
           brew tap --force $GITHUB_REPOSITORY
 
       - name: Test formula
-        run: brew install -v tctl
+        run: |
+          # Install with explicit tap reference to ensure our formula is used
+          brew install -v smarunich/tctl/tctl

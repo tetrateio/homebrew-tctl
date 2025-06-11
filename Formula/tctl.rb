@@ -1,4 +1,7 @@
 class Tctl < Formula
+  # Use fully qualified formula name to ensure our version is used
+  conflicts_with "tctl", because: "Provides the same binary"
+  
   desc "Tetrate Service Bridge Command Line Interface"
   homepage "https://docs.tetrate.io/service-bridge/reference/cli/guide/"
   version "1.12.4"

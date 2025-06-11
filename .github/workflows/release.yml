@@ -64,7 +64,14 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: Release ${{ env.VERSION }}
-          body: ${{ env.NOTES }}
+          body: |
+            To install this release:
+            ```
+            brew tap smarunich/tctl
+            brew install smarunich/tctl/tctl
+            ```
+            
+            ${{ env.NOTES }}
           draft: false
           prerelease: false
         env:
