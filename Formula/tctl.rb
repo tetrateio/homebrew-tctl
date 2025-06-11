@@ -4,15 +4,15 @@ class Tctl < Formula
   
   desc "Tetrate Service Bridge Command Line Interface"
   homepage "https://docs.tetrate.io/service-bridge/reference/cli/guide/"
-  version "1.12.0"
+  version "1.12.2"
   license "Commercial"
 
   if Hardware::CPU.intel?
     url "https://binaries.dl.tetrate.io/public/raw/versions/darwin-amd64-#{version}/tctl"
-    sha256 "43c98641d7fcb07c78079e8c3895abd100bcfaa9a52b86e41c5f43dd4604aaa4" # Intel
+    sha256 "cda1e3404e867dc60a9ecb19d3c2116bcf61d9c36a5cac4779850de6a4a0d0e4" # Intel
   else
     url "https://binaries.dl.tetrate.io/public/raw/versions/darwin-arm64-#{version}/tctl"
-    sha256 "c78f0e1604be2ce41a3ae2538dd3373a7e36f175ed6e44580c339b934d28d94e" # ARM
+    sha256 "0204df0dc1c8b4b6b4ab7178735d2bd804080100f01c598b895263e4e066ee66" # ARM
   end
 
   def install
