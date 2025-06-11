@@ -8,6 +8,12 @@ on:
       - main
 
 
+# Set permissions for the workflow
+permissions:
+  contents: write  # This allows pushing to the repository
+  packages: write  # If you need to publish packages
+  pull-requests: write  # If you need to create PRs
+
 jobs:
   build:
     name: Create Release
