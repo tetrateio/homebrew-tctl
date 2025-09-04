@@ -9,10 +9,10 @@ class Tctl < Formula
 
   if Hardware::CPU.intel?
     url "https://binaries.dl.tetrate.io/public/raw/versions/darwin-amd64-#{version}/tctl"
-    sha256 "d4f94b0419bfd0d592d945c4dda2ec5f5a8d57d85dfc43c8a7fbfe8b6e9ea6eb" # Intel
+    sha256 "d73002dff245fdd4ed0f50b8e36be42a8910a1297c3a13d0356cb0bf54fe8490" # Intel
   else
     url "https://binaries.dl.tetrate.io/public/raw/versions/darwin-arm64-#{version}/tctl"
-    sha256 "1b115cdaf0d839b6c8431ce1ad79cbb466b8282cf5de6080237b4a3864583110" # ARM
+    sha256 "173e76dbe320b324644e609d9a1a9f67ca986e9f215f202ed236dc0ed7e8d892" # ARM
   end
 
   def install
